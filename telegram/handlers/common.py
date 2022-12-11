@@ -4,7 +4,7 @@ from telegram import markups
 from database.controllers import books_controller, message_controller
 from app_types import User
 import datetime
-from config.bot_config import ADMIN_ID, GREETING_MSG
+from config.bot_config import ADMIN_ID
 
 
 async def start_command(message: types.Message, state: FSMContext):

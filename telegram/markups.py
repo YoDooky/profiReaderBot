@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from database.controllers import message_controller
+from database.controllers import message_controller, books_controller
+from telegram import aux_funcs
 
 
 def get_start_menu():
@@ -9,19 +10,31 @@ def get_start_menu():
     return user_menu
 
 
-def get_next_part_button():
+def get_next_part_button(user_id: int):
     next_part_button = InlineKeyboardMarkup(row_width=1)
     next_button = InlineKeyboardButton(text='>>>', callback_data='next_part')
+    book_name = books_controller.db_read_user_current_book(user_id)
+    progress = aux_funcs.get_progress_data(user_id, book_name)
+    progress_bar = InlineKeyboardButton(text=f'{progress.get("progress_percent")}% '
+                                             f'({progress.get("last_part_numb")}/{progress.get("parts_amount")})',
+                                        callback_data='progress_bar')
     next_part_button.insert(next_button)
+    next_part_button.insert(progress_bar)
     return next_part_button
 
 
-def get_nav_menu():
+def get_nav_menu(user_id: int):
     nav_menu = InlineKeyboardMarkup(row_width=2)
     prev_button = InlineKeyboardButton(text='<<<', callback_data='prev_part')
     next_button = InlineKeyboardButton(text='>>>', callback_data='next_part')
+    book_name = books_controller.db_read_user_current_book(user_id)
+    progress = aux_funcs.get_progress_data(user_id, book_name)
+    progress_bar = InlineKeyboardButton(text=f'{progress.get("progress_percent")}% '
+                                             f'({progress.get("last_part_numb")}/{progress.get("parts_amount")})',
+                                        callback_data='progress_bar')
     nav_menu.insert(prev_button)
     nav_menu.insert(next_button)
+    nav_menu.insert(progress_bar)
     return nav_menu
 
 

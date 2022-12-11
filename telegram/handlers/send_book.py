@@ -52,22 +52,23 @@ class SetPost:
         vars_global.update_schedule = [True, user_id]
         if books_part_text.get('new_book'):
             await message.answer(message_controller.db_read_messages().first_book_msg)
-            keyboard = markups.get_next_part_button()
+            keyboard = markups.get_next_part_button(user_id)
         else:
             await message.answer(message_controller.db_read_messages().same_book_msg)
-            keyboard = markups.get_nav_menu()
+            keyboard = markups.get_nav_menu(user_id)
         await message.answer(books_part_text.get('books_part_text'), reply_markup=keyboard)
         await state.finish()
 
     @staticmethod
     async def get_books_next_part(call: types.CallbackQuery):
         """Go to next book part"""
-        books_part_text = aux_funcs.get_target_part_text(call.message.chat.id, 'inc')
+        user_id = call.message.chat.id
+        books_part_text = aux_funcs.get_target_part_text(user_id, 'inc')
         if not books_part_text:
             await call.message.edit_text(message_controller.db_read_messages().reeding_complete_msg)
             return
-        keyboard = markups.get_nav_menu()
-        await call.message.edit_text(books_part_text, reply_markup=keyboard)
+        keyboard = markups.get_nav_menu(user_id)
+        await call.message.answer(books_part_text, reply_markup=keyboard)
 
     @staticmethod
     async def get_books_prev_part(call: types.CallbackQuery):
@@ -79,10 +80,10 @@ class SetPost:
             return
         book_name = books_controller.db_read_user_current_book(user_id)
         prev_page = aux_funcs.get_last_part_numb(user_id, book_name)
-        keyboard = markups.get_nav_menu()
+        keyboard = markups.get_nav_menu(user_id)
         if prev_page == 1:
-            keyboard = markups.get_next_part_button()
-        await call.message.edit_text(books_part_text, reply_markup=keyboard)
+            keyboard = markups.get_next_part_button(user_id)
+        await call.message.answer(books_part_text, reply_markup=keyboard)
 
     def register_handlers(self, dp: Dispatcher):
         """Register handlers"""

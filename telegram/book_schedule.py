@@ -7,6 +7,7 @@ from database.controllers import books_controller
 import vars_global
 from telegram import markups
 from app_types import User
+from telegram import aux_funcs
 
 
 class Schedule:
@@ -24,7 +25,7 @@ class Schedule:
         books_part_text = books_controller.db_read_books_part_text(book_name, next_book_part)
         user_progress.last_part_numb = next_book_part
         books_controller.db_update_progress_table(user_progress)
-        keyboard = markups.get_nav_menu()
+        keyboard = markups.get_nav_menu(user_id)
         try:
             await self.bot.send_message(chat_id=user_id, text=books_part_text, reply_markup=keyboard)
         except aiogram.utils.exceptions.BotBlocked:
@@ -54,12 +55,14 @@ class Schedule:
             if not user_progress:
                 continue
             if user_progress.last_part_numb >= user_progress.parts_amount:
+                adawda
                 continue
             if not user_book:
                 continue
-            aioschedule.every().minute.do(self.send_book_text,
-                                          user_id=user_id,
-                                          user_obj=user).tag(f'{user_id}')
+            schedule_time = aux_funcs.format_schedule_time(user_progress)
+            aioschedule.every().day.at(schedule_time).do(self.send_book_text,
+                                                         user_id=user_id,
+                                                         user_obj=user).tag(f'{user_id}')
 
     def update_schedule(self):
         print('[SHEDULE] Updating user schedule...')
@@ -78,6 +81,7 @@ class Schedule:
                 continue
             if not user_book:
                 continue
-            aioschedule.every().minute.do(self.send_book_text,
-                                          user_id=user_id,
-                                          user_obj=user).tag(f'{user_id}')
+            schedule_time = aux_funcs.format_schedule_time(user_progress)
+            aioschedule.every().day.at(schedule_time).do(self.send_book_text,
+                                                         user_id=user_id,
+                                                         user_obj=user).tag(f'{user_id}')

@@ -138,3 +138,23 @@ def write_book_to_db(user_id: int, filepath: str):
     text_parts = divide_string_to_parts(epub_text, user_id)
     table_name = get_book_name(filepath)
     books_controller.db_add_book_table(table_name, text_parts)
+
+
+def get_progress_data(user_id: int, book_name: str):
+    progress_data = books_controller.db_read_user_progress(user_id, book_name)
+    last_part_numb = progress_data.last_part_numb
+    parts_amount = progress_data.parts_amount
+    progress_percent = round(last_part_numb * 100 / parts_amount, 2)
+    return {
+        'last_part_numb': last_part_numb,
+        'parts_amount': parts_amount,
+        'progress_percent': progress_percent
+    }
+
+
+def format_schedule_time(user_progress: Progress) -> str:
+    """Format time to HH:MM format"""
+    raw_scheduled_time = user_progress.shedule_read_timestamp
+    scheduled_time = raw_scheduled_time.split(' ')[1].split('.')[0].split(':')
+    scheduled_time = ':'.join([scheduled_time[0], scheduled_time[1]])
+    return scheduled_time
